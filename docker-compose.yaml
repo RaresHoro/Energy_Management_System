@@ -1,0 +1,118 @@
+version: '3.8'
+
+services:
+  user-management:
+    image: user-management:latest
+    deploy:
+      replicas: 1
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://user-db:3306/user_management
+      SPRING_DATASOURCE_USERNAME: root
+      SPRING_DATASOURCE_PASSWORD: 1234
+    depends_on:
+      - user-db
+    networks:
+      - my-network
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.user-management.rule=Host(`user.localhost`)"
+      - "traefik.http.services.user-management.loadbalancer.server.port=8080"
+
+  reverse-proxy:
+    image: traefik:v3.2
+    command:
+      - --api.insecure=true
+      - --providers.docker
+      - --accesslog=true
+      - --accesslog.filepath=/var/log/traefik/access.log
+      - --log.level=DEBUG
+      - --entrypoints.web.address=:80
+    ports:
+      - "80:80"
+      - "8080:8080"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - traefik_logs:/var/traefik
+    networks:
+      - my-network
+
+  user-db:
+    image: mysql:5.7
+    environment:
+      MYSQL_ROOT_PASSWORD: 1234
+      MYSQL_DATABASE: user_management
+    networks:
+      - my-network
+
+  device-management:
+    image: device-management:latest
+    deploy:
+      replicas: 1
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://device-db:3306/device_management
+      SPRING_DATASOURCE_USERNAME: root
+      SPRING_DATASOURCE_PASSWORD: 1234
+    depends_on:
+      - device-db
+    networks:
+      - my-network
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.device-management.rule=Host(`device.localhost`)"
+      - "traefik.http.services.device-management.loadbalancer.server.port=8081"
+
+  device-db:
+    image: mysql:5.7
+    environment:
+      MYSQL_ROOT_PASSWORD: 1234
+      MYSQL_DATABASE: device_management
+    networks:
+      - my-network
+
+  chat-management:
+    image: chat:latest
+    deploy:
+      replicas: 1
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://chat-db:3306/chatdb
+      SPRING_DATASOURCE_USERNAME: root
+      SPRING_DATASOURCE_PASSWORD: 1234
+    depends_on:
+      - chat-db
+    networks:
+      - my-network
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.chat-management.rule=Host(`chat.localhost`)"
+      - "traefik.http.services.chat-management.loadbalancer.server.port=8082"
+
+  chat-db:
+    image: mysql:5.7
+    environment:
+      MYSQL_ROOT_PASSWORD: 1234
+      MYSQL_DATABASE: chatdb
+    ports:
+      - "3309:3306"
+    networks:
+      - my-network
+
+  frontend:
+    image: energy-management:latest
+    ports:
+      - "3000:3000"
+    networks:
+      - my-network
+    depends_on:
+      - user-management
+      - device-management
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.frontend.rule=Host(`frontend.localhost`)"
+      - "traefik.http.services.frontend.loadbalancer.server.port=3000"
+
+networks:
+  my-network:
+    driver: bridge
+
+volumes:
+  traefik_logs:

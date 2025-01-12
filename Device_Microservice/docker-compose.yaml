@@ -1,0 +1,31 @@
+version: '3.8'
+
+services:
+  device-management:
+    image: device-management:latest  # Specify your local image for the device management service
+    ports:
+      - "8081:8081"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://db:3306/device_management
+      SPRING_DATASOURCE_USERNAME: root
+      SPRING_DATASOURCE_PASSWORD: 1234
+    depends_on:
+      - db
+    networks:
+      - my-network
+
+  db:
+    image: mysql:5.7
+    environment:
+      MYSQL_ROOT_PASSWORD: 1234
+      MYSQL_DATABASE: device_management
+    ports:
+      - "3308:3306"
+    networks:
+      - my-network
+
+
+
+networks:
+  my-network:
+    driver: bridge

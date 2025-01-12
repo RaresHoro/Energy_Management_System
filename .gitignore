@@ -1,0 +1,69 @@
+# Java and Spring Boot
+*.class
+*.jar
+*.war
+*.ear
+*.log
+*.DS_Store
+*.project
+*.settings/
+*.classpath
+target/
+build/
+
+# IntelliJ IDEA files
+.idea/
+*.iml
+*.iws
+out/
+
+# Maven and Gradle
+.mvn/
+.settings/
+!mvnw
+!mvnw.cmd
+/.gradle
+/gradle-wrapper.jar
+
+# Node.js and React
+node_modules/
+npm-debug.log*
+yarn-error.log
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+/build
+
+# Docker
+*.env
+docker-compose.override.yml
+.dockerignore
+
+# Traefik
+acme.json
+
+# Logs and temp files
+*.log
+*.pid
+*.seed
+*.pid.lock
+hs_err_pid*
+*.swp
+*.swo
+*~
+*.bak
+*.tmp
+*.lock
+Thumbs.db
+
+# Kubernetes
+*.kube/
+.kube/config
+kubectl-config.yml
+
+# System files
+.vscode/
+*.swp
+*.swo
+*~
